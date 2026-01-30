@@ -1,73 +1,92 @@
-# React + TypeScript + Vite
+# ChatBot MC Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, ChatGPT-style chat interface built with React, TypeScript, and Material-UI.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 💬 Real-time chat interface
+- 🎨 Modern dark theme UI (inspired by ChatGPT)
+- ⚡ Fast and responsive
+- 📱 Mobile-friendly design
+- 🔄 Auto-scrolling to latest messages
+- ⌨️ Keyboard shortcuts (Enter to send, Shift+Enter for new line)
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+- **React 19** - UI framework
+- **TypeScript** - Type safety
+- **Material-UI (MUI)** - Component library
+- **Vite** - Build tool
+- **Emotion** - CSS-in-JS styling
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js 18+ installed
+- Backend server running on `http://localhost:8080`
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The application will be available at `http://localhost:5173`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Build for Production
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
+npm run preview
 ```
+
+## Usage
+
+1. Open `http://localhost:5173` in your browser
+2. Type your message in the input field at the bottom
+3. Press **Enter** to send (or click the send button)
+4. Use **Shift+Enter** to add a new line without sending
+
+## API Integration
+
+The frontend connects to the backend API at:
+- **Endpoint**: `http://localhost:8080/api/llm/chat`
+- **Method**: POST
+- **Body**: `{ "prompt": "your message" }`
+
+## Customization
+
+### Change Theme Colors
+
+Edit the theme in `src/App.tsx`:
+
+```typescript
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#10a37f', // Change this color
+    },
+    // ...
+  },
+})
+```
+
+### Change Backend URL
+
+Update the fetch URL in `src/App.tsx`:
+
+```typescript
+const response = await fetch('YOUR_BACKEND_URL/api/llm/chat', {
+  // ...
+})
+```
+
+## License
+
+MIT
