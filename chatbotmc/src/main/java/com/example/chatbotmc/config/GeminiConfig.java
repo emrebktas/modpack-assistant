@@ -10,7 +10,7 @@ public class GeminiConfig {
     @Bean
     public WebClient geminiWebClient() {
         return WebClient.builder()
-                .baseUrl("https://generativelanguage.googleapis.com/v1beta")
+                .baseUrl("https://generativelanguage.googleapis.com/")
                 .build();
     }
 }
