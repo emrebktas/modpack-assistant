@@ -37,7 +37,7 @@ public class GeminiLlmClient implements LlmClient {
         );
 
         Map<String, Object> response = webClient.post()
-                .uri("/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey)
+                .uri("/v1beta/models/gemini-2.0-flash-lite-001:generateContent?key=" + apiKey)
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
