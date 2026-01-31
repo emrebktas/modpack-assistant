@@ -33,6 +33,15 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name = "approved_by_admin")
+    private boolean approvedByAdmin = false;
+
+    @Column(name = "approval_token")
+    private String approvalToken;
+
+    @Column(name = "approval_requested_at")
+    private LocalDateTime approvalRequestedAt;
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();

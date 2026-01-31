@@ -5,7 +5,7 @@ interface RegisterRequest {
 }
 
 interface AuthResponse {
-  token: string;
+  token: string | null;
   username: string;
   email: string;
   role: string;
@@ -26,14 +26,17 @@ export const login = async (data: LoginRequest): Promise<AuthResponse> => {
   });
 
   if (!response.ok) {
-    throw new Error('Login failed. Please check your credentials.');
+    const errorData = await response.json().catch(() => ({ message: 'Login failed' }));
+    throw new Error(errorData.message || 'Login failed. Please check your credentials.');
   }
   
   const authData: AuthResponse = await response.json();
   
   // Store token in localStorage
-  localStorage.setItem('token', authData.token);
-  localStorage.setItem('username', authData.username);
+  if (authData.token) {
+    localStorage.setItem('token', authData.token);
+    localStorage.setItem('username', authData.username);
+  }
   
   return authData;
 };
@@ -48,14 +51,14 @@ export const register = async (data: RegisterRequest): Promise<AuthResponse> => 
   });
   
   if (!response.ok) {
-    throw new Error('Failed to register. Please try again.');
+    const errorData = await response.json().catch(() => ({ message: 'Registration failed' }));
+    throw new Error(errorData.message || 'Failed to register. Please try again.');
   }
   
   const authData: AuthResponse = await response.json();
   
-  // Store token in localStorage
-  localStorage.setItem('token', authData.token);
-  localStorage.setItem('username', authData.username);
+  // Don't store token yet - user needs to confirm email first
+  // Token will be null until email is confirmed
   
   return authData;
 };

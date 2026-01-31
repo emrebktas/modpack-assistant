@@ -255,9 +255,8 @@ function App() {
   }
 
   const handleRegisterSuccess = (user: string) => {
-    setAuthenticated(true)
-    setUsername(user)
-    setSnackbarMessage(`Welcome, ${user}! Your account has been created.`)
+    // Don't authenticate yet - user needs admin approval first
+    setSnackbarMessage(`Registration successful, ${user}! Your account is pending admin approval. You'll receive an email once approved.`)
     setSnackbarOpen(true)
   }
 

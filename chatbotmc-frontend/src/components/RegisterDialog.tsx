@@ -29,6 +29,7 @@ export default function RegisterDialog({ open, onClose, onRegisterSuccess, onSwi
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleRegister = async () => {
     // Validation
@@ -62,8 +63,10 @@ export default function RegisterDialog({ open, onClose, onRegisterSuccess, onSwi
 
     try {
       const response = await register({ username, email, password });
+      // Show success message - user needs admin approval
+      setSuccess(true);
+      // Notify parent component
       onRegisterSuccess(response.username);
-      onClose();
       // Reset form
       setUsername('');
       setEmail('');
@@ -84,6 +87,7 @@ export default function RegisterDialog({ open, onClose, onRegisterSuccess, onSwi
 
   const handleClose = () => {
     setError('');
+    setSuccess(false);
     onClose();
   };
 
@@ -115,6 +119,12 @@ export default function RegisterDialog({ open, onClose, onRegisterSuccess, onSwi
           {error && (
             <Alert severity="error" onClose={() => setError('')}>
               {error}
+            </Alert>
+          )}
+
+          {success && (
+            <Alert severity="success" onClose={() => setSuccess(false)}>
+              Registration successful! Your account is pending admin approval. You will receive an email once approved.
             </Alert>
           )}
 
@@ -179,17 +189,25 @@ export default function RegisterDialog({ open, onClose, onRegisterSuccess, onSwi
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={handleClose} disabled={loading}>
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleRegister}
-          disabled={loading || !username.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()}
-          startIcon={<PersonAddIcon />}
-        >
-          {loading ? 'Registering...' : 'Register'}
-        </Button>
+        {success ? (
+          <Button onClick={handleClose} fullWidth variant="contained">
+            Close
+          </Button>
+        ) : (
+          <>
+            <Button onClick={handleClose} disabled={loading}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleRegister}
+              disabled={loading || !username.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()}
+              startIcon={<PersonAddIcon />}
+            >
+              {loading ? 'Registering...' : 'Register'}
+            </Button>
+          </>
+        )}
       </DialogActions>
     </Dialog>
   );
