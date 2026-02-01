@@ -109,6 +109,13 @@
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
+		<!-- SendGrid for email sending -->
+		<dependency>
+			<groupId>com.sendgrid</groupId>
+			<artifactId>sendgrid-java</artifactId>
+			<version>4.10.2</version>
+		</dependency>
+
 		<!-- pgvector for vector similarity search -->
 		<dependency>
 			<groupId>com.pgvector</groupId>
