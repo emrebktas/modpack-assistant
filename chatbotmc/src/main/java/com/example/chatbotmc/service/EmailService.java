@@ -1,19 +1,24 @@
 package com.example.chatbotmc.service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import com.sendgrid.*;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import java.io.IOException;
 
 @Service
 public class EmailService {
     
-    private final JavaMailSender mailSender;
+    @Value("${sendgrid.api-key}")
+    private String sendGridApiKey;
     
-    @Value("${spring.mail.username}")
+    @Value("${sendgrid.from-email:noreply@yourdomain.com}")
     private String fromEmail;
+    
+    @Value("${sendgrid.from-name:Modpack Assistant}")
+    private String fromName;
     
     @Value("${app.backend.url:http://localhost:8080}")
     private String backendUrl;
@@ -21,52 +26,69 @@ public class EmailService {
     @Value("${admin.email}")
     private String adminEmail;
     
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
-    
     public void sendAdminApprovalEmail(String username, String email, String approvalToken) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            
-            helper.setFrom(fromEmail);
-            helper.setTo(adminEmail);
-            helper.setSubject("New User Registration Approval Required - " + username);
+            Email from = new Email(fromEmail, fromName);
+            Email to = new Email(adminEmail);
+            String subject = "New User Registration Approval Required - " + username;
             
             String approveUrl = backendUrl + "/api/auth/approve-user?token=" + approvalToken + "&action=approve";
             String rejectUrl = backendUrl + "/api/auth/approve-user?token=" + approvalToken + "&action=reject";
             
             String htmlContent = buildAdminApprovalEmail(username, email, approveUrl, rejectUrl);
-            helper.setText(htmlContent, true);
+            Content content = new Content("text/html", htmlContent);
             
-            mailSender.send(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException("Email gönderilemedi: " + e.getMessage());
+            Mail mail = new Mail(from, subject, to, content);
+            SendGrid sg = new SendGrid(sendGridApiKey);
+            Request request = new Request();
+            
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            
+            Response response = sg.api(request);
+            
+            if (response.getStatusCode() >= 400) {
+                throw new RuntimeException("SendGrid error: " + response.getStatusCode() + " - " + response.getBody());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Email could not be sent: " + e.getMessage(), e);
         }
     }
     
     public void sendUserApprovalNotification(String userEmail, String username, boolean approved) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            Email from = new Email(fromEmail, fromName);
+            Email to = new Email(userEmail);
             
-            helper.setFrom(fromEmail);
-            helper.setTo(userEmail);
+            String subject;
+            String htmlContent;
             
             if (approved) {
-                helper.setSubject("Your Account Has Been Approved!");
-                String htmlContent = buildUserApprovedEmail(username);
-                helper.setText(htmlContent, true);
+                subject = "Your Account Has Been Approved!";
+                htmlContent = buildUserApprovedEmail(username);
             } else {
-                helper.setSubject("Registration Status Update");
-                String htmlContent = buildUserRejectedEmail(username);
-                helper.setText(htmlContent, true);
+                subject = "Registration Status Update";
+                htmlContent = buildUserRejectedEmail(username);
             }
             
-            mailSender.send(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException("Email gönderilemedi: " + e.getMessage());
+            Content content = new Content("text/html", htmlContent);
+            Mail mail = new Mail(from, subject, to, content);
+            
+            SendGrid sg = new SendGrid(sendGridApiKey);
+            Request request = new Request();
+            
+            request.setMethod(Method.POST);
+            request.setEndpoint("mail/send");
+            request.setBody(mail.build());
+            
+            Response response = sg.api(request);
+            
+            if (response.getStatusCode() >= 400) {
+                throw new RuntimeException("SendGrid error: " + response.getStatusCode() + " - " + response.getBody());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Email could not be sent: " + e.getMessage(), e);
         }
     }
     
