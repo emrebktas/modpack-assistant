@@ -24,7 +24,6 @@ Live at:  https://modpack-assistant.vercel.app/
 ## Prerequisites
 
 - **Java 21**
-- **Node.js 18+**
 - **PostgreSQL**
 - **Environment:** Gemini API key, JWT secret, SendGrid (or SMTP), admin email
 
